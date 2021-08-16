@@ -16,8 +16,13 @@ def get_data(url):
 	html = driver.execute_script("return document.getElementsByTagName('html')[0].innerHTML")
 
 	soup = BS(html, 'lxml')
-	items = soup.find_all('div', class_="KL4Bh").get('href')
-	return items
+	items = soup.find_all('div', class_="KL4Bh")
+	links = []
+	for item in items:
+		item.find('img', class_="FFVAD")
+		links.append(item)
+
+	return links
 
 def main():
 	url = 'https://www.instagram.com/mashina_satam/?hl=ru'

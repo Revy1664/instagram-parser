@@ -1,4 +1,3 @@
-import requests
 from bs4 import BeautifulSoup as BS
 from selenium import webdriver
 from time import sleep
@@ -6,28 +5,43 @@ import urllib
 from urllib.request import urlretrieve
 import os
 
-def get_data(url):
-    # Добавление заголовков
-    HEADERS = {
-        'user-agent': 'Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.131 Safari/537.36',
-        'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
-        'accept-encoding': 'gzip, deflate, br',
-        'accept-language': 'ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7,la;q=0.6',
-        'cache-control': 'max-age=0'
-    }
+def get_soup(html):
+    '''
+    Эта функция возращает объект soup'a
+    '''
 
-    # Настройка ChromeDriver и переход по url
-    driver = webdriver.Chrome()
-    driver.get(url)
+    soup = BS(html, 'lxml')
+    
+    return soup 
+
+def get_src(soup):
+    '''
+    Эта функция возращает ссылки на изображения
+    '''
+    items = soup.find_all('div', class_="KL4Bh") # Поиск блоков с изображениями
+    
+    links = []
+
+    for item in items: # Проход по блокам и поиск тегов img
+        link = item.find('img').get('src') # Извлечение ссылок из тега img
+        links.append(link)
+
+    return links
+
+def get_html(url):
+    '''
+    Эта функция возращает содержимое html-тега
+    '''
+    driver = webdriver.Chrome() # Настройка WebDriver
+    driver.get(url) # Переход по URL
 
     # Вход
-    # Нажатие на пост
     driver.find_element_by_class_name('_9AhH0').click()
-    driver.implicitly_wait(10)
+    driver.implicitly_wait(50)
     # Ввод логина
-    driver.find_element_by_xpath('/html/body/div[6]/div[2]/div/div[2]/div/div/div[1]/div/form/div[1]/div[1]/div/label/input').send_keys('steinsgate95@mail.ru')
+    driver.find_element_by_xpath('/html/body/div[6]/div[2]/div/div[2]/div/div/div[1]/div/form/div[1]/div[1]/div/label/input').send_keys('nmaksimov976@gmail.com')
     # Ввод пароля
-    driver.find_element_by_xpath('/html/body/div[6]/div[2]/div/div[2]/div/div/div[1]/div/form/div[1]/div[2]/div/label/input').send_keys('gQ25yz7832')
+    driver.find_element_by_xpath('/html/body/div[6]/div[2]/div/div[2]/div/div/div[1]/div/form/div[1]/div[2]/div/label/input').send_keys('Nik.2005')
 
     # Нажатие кноки "Войти"
     driver.find_element_by_xpath('/html/body/div[6]/div[2]/div/div[2]/div/div/div[1]/div/form/div[1]/div[3]/button').click()
@@ -35,36 +49,36 @@ def get_data(url):
     # Нажатие кнопки "Не сейчас"
     driver.find_element_by_xpath('/html/body/div[1]/section/main/div/div/div/div/button').click()
 
+    for i in range(21):
 
-    # Имитация скролла
-    for i in range(37):
-        driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-        sleep(1.5)
-
-    # Получение содержимого тега html
-    html = driver.execute_script("return document.getElementsByTagName('html')[0].innerHTML")
-
-    # Парсинг
-    soup = BS(html, 'lxml')
-    items = soup.find_all('div', class_="KL4Bh")
-    links = []
-    for item in items:
-        image = item.find('img', class_="FFVAD")
-        links.append(image.attrs['src'])
-
-    # Скачивание файлов
-    # os.chdir('C:\\Users\\Никита\\Desktop\\instagram-parser\\img')
-    # for i in range(447):
-    #     name = f'img{i}.png'
-    #     url = links[i]
-    #     urllib.request.urlretrieve(url, name)
+        for j in range(3):
+            driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+            
+            html = driver.execute_script("return document.getElementsByTagName('html')[0].innerHTML") # Получение содержимого html-тега
+        
+            soup = get_soup(html)
+            links = get_src(soup)
+        download_images(links)
 
 
-    return links
+def download_images(links):
+    '''
+    Эта функция скачивает изображения в папку img
+    '''
+    os.chdir('C:\\Users\\Никита\\Desktop\\instagram-parser\\img') # Переход в папку img
+
+
+    # Скачивание каждого файла
+    for i in range(len(links)):
+        name = f'{i}.jpeg' # Имя файла
+        url = links[i] # URL для скачивания файла
+        urllib.request.urlretrieve(url, name) # Скачивание файла
+
 
 def main():
     url = 'https://www.instagram.com/mashina_satam/?hl=ru'
-    print(*get_data(url), sep='\n')
+
+    print(get_html(url))
 
 if __name__ == '__main__':
     main()

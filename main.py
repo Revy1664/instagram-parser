@@ -32,6 +32,8 @@ def get_html(url):
     '''
     Эта функция возращает содержимое html-тега
     '''
+    login = input('Ваш логин: ')
+    password = input('Ваш пароль: ')
     driver = webdriver.Chrome() # Настройка WebDriver
     driver.get(url) # Переход по URL
 
@@ -39,9 +41,9 @@ def get_html(url):
     driver.find_element_by_class_name('_9AhH0').click()
     driver.implicitly_wait(50)
     # Ввод логина
-    driver.find_element_by_xpath('/html/body/div[6]/div[2]/div/div[2]/div/div/div[1]/div/form/div[1]/div[1]/div/label/input').send_keys('steinsgate95@mail.ru')
+    driver.find_element_by_xpath('/html/body/div[6]/div[2]/div/div[2]/div/div/div[1]/div/form/div[1]/div[1]/div/label/input').send_keys(login)
     # Ввод пароля
-    driver.find_element_by_xpath('/html/body/div[6]/div[2]/div/div[2]/div/div/div[1]/div/form/div[1]/div[2]/div/label/input').send_keys('gQ25yz7832')
+    driver.find_element_by_xpath('/html/body/div[6]/div[2]/div/div[2]/div/div/div[1]/div/form/div[1]/div[2]/div/label/input').send_keys(password)
 
     # Нажатие кноки "Войти"
     driver.find_element_by_xpath('/html/body/div[6]/div[2]/div/div[2]/div/div/div[1]/div/form/div[1]/div[3]/button').click()
